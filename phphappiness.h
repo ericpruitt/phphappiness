@@ -46,10 +46,14 @@
 // Order of arguments (array/string search)
 
 // Let's just make everything haystack / needle for consistency.
-// TODO: Use __VA_ARGS__ and nested macros for third, optional argument.
 
-#define array_key_exists(haystack, needle) array_key_exists(needle, haystack)
-#define in_array(haystack, needle) in_array(haystack, needle, true)
-#define array_search(haystack, needle) array_search(haystack, needle, true)
+#define array_key_exists(haystack, needle, ...) \
+    array_key_exists(needle, haystack, ##__VA_ARGS__)
+
+#define in_array(haystack, needle, ...) \
+    in_array(haystack, needle, ##__VA_ARGS__)
+
+#define array_search(haystack, needle, ...) \
+    array_search(needle, haystack, ##__VA_ARGS__)
 
 #endif
