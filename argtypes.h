@@ -16,14 +16,28 @@
  * of commas. Calls to the function remain the same, and any attempts to call
  * the function with invalid types will result in an InvalidArgumentException
  * being thrown.
+ *
+ * When specifying type restrictions for numerics, integers will be accepted
+ * for functions that specify "float", "double", or "real" as the argument
+ * type. However, the reverse is not true: if "integer" is specified as the
+ * argument type, floating point numbers will be rejected by the function.
  */
 #ifndef ARGTYPES_H
 #define ARGTYPES_H
 
+#define float double
+#define real double
+
 #define REQ(type, varname) \
     varname = func_get_arg($_++); \
-    if(gettype(varname) !== #type) \
-        throw new InvalidArgumentException("Argument $_ is not ".#type.".");
+    if(($__ = gettype(varname)) !== #type) { \
+        if ($__ !== #type and \
+         !(in_array(#type, array("float", "real", "double")) and \
+          ($__ === "integer" or $__ === "double"))) { \
+            $message = "Got $__ for argument $_ but expected ".#type; \
+            throw new InvalidArgumentException($message); \
+        } \
+    }
 
 #define FUNCTION(name, argasserts) \
     function name() \
