@@ -5,12 +5,23 @@
 
 #define THROW(type, message) (eval("throw new ".#type."(\"".message."\");"))
 
-#define json_encode(v) (((($_ = json_encode(v)) or true) and \
-    (($__ = json_last_error()) ? THROW(DomainException, "JSON Error #$__") : \
+#define THROWER(function, args, test, e) (((($_ = function args) or true) and \
+    (($__ = test) ? THROW(e, #test . " error $__") : \
     false)) ?: $_)
 
-#define json_decode(v) (((($_ = json_decode(v)) or true) and \
-    (($__ = json_last_error()) ? THROW(DomainException, "JSON Error #$__") : \
-    false)) ?: $_)
+#define json_encode(v) \
+    THROWER(json_encode, (__VA_ARGS__), json_last_error(), DomainException)
+
+#define json_decode(...) \
+    THROWER(json_decode, (__VA_ARGS__), json_last_error(), DomainException)
+
+#define preg_match(...) \
+    THROWER(preg_match, (__VA_ARGS__), preg_last_error(), RuntimeException)
+
+#define preg_match_all(...) \
+    THROWER(preg_match_all, (__VA_ARGS__), preg_last_error(), RuntimeException)
+
+#define preg_match_replace(...) \
+    THROWER(preg_match_all, (__VA_ARGS__), preg_last_error(), RuntimeException)
 
 #endif
