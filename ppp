@@ -1,4 +1,42 @@
 #!/usr/bin/env php
 <?php
+
+$usage = <<<USAGE
+Usage: ppp [-h] [-e] [-p] INFILE [INFILE...]
+
+    -e      Show pre-processed code without executing it
+    -h      Display this usage text and exit
+    -p      Disable automatic header inclusion so only headers explicitly
+            included with #include will be included during preprocessing.
+
+To process a file beginning with a "-", prefix it "./", e.g. "-test-" would
+become "./-test-".
+
+USAGE;
+
+$options = getopt('hep');
+
+if (isset($options['h'])) {
+    echo $usage;
+    exit(0);
+} else if (count($argv) < 2) {
+    echo $usage;
+    exit(1);
+}
+
 require_once('PHPHappiness/CPPStreamWrapper.php');
-include('phph://' . $argv[1]);
+foreach (array_slice($argv, 1) as $path) {
+    if (strpos($path, '-') !== 0) {
+        if (isset($options['e'])) {
+            $path = "cpp://$path";
+        } else {
+            $path = "phph://$path";
+        }
+
+        if (isset($options['p'])) {
+            echo file_get_contents($path);
+        } else {
+            require_once($path);
+        }
+    }
+}

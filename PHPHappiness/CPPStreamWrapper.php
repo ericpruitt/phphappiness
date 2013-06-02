@@ -13,7 +13,14 @@ class CPPStreamWrapper
         }
 
         // Strip the scheme off the path
-        $scheme = parse_url($path, PHP_URL_SCHEME);
+        if (stripos($path, 'cpp://') === 0) {
+            $scheme = 'cpp';
+        } else if (stripos($path, 'phph://') === 0) {
+            $scheme = 'phph';
+        } else {
+            $scheme = parse_url($path, PHP_URL_SCHEME);
+        }
+
         $path = substr($path, strlen($scheme) + 3);
 
         // When STREAM_USE_PATH is set, all files in the include path should be
