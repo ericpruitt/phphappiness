@@ -9,12 +9,12 @@ class CPPStreamWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         if (!preg_match('/^rb?$/', $mode)) {
-            throw InvalidArgumentException('Access mode must be read-only.');
+            throw \InvalidArgumentException('Access mode must be read-only.');
         }
 
         // Strip the scheme off the path
-        $parsedpath = parse_url($path);
-        $path = $parsedpath['host'];
+        $scheme = parse_url($path, PHP_URL_SCHEME);
+        $path = substr($path, strlen($scheme) + 3);
 
         // When STREAM_USE_PATH is set, all files in the include path should be
         // searched. To avoid duplicating the search logic already implemented
@@ -22,7 +22,7 @@ class CPPStreamWrapper
         if ($options & STREAM_USE_PATH and !is_file($path)) {
             $handle = fopen($path, "r", true);
             if (!$handle) {
-                throw new Exception("Could open path '$path'.");
+                throw new \Exception("Could open path '$path'.");
             }
 
             $metadata = stream_get_meta_data($handle);
@@ -32,7 +32,7 @@ class CPPStreamWrapper
 
         // With phph files, assume all discovered headers should be included by
         // the pre-processor automatically.
-        $autoinclude = $parsedpath['scheme'] === 'phph';
+        $autoinclude = $scheme === 'phph';
 
         $this->_process = preprocess_file($path, $autoinclude);
         $this->opened_path = $opened_path = $path;
@@ -96,11 +96,10 @@ function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
                 }
             }
 
-        } else {
-            $cppargs[] = '-I';
-            $cppargs[] = $path;
-
         }
+
+        $cppargs[] = '-I';
+        $cppargs[] = $path;
     }
 
     $cppargs[] = $phph_filename;
@@ -115,7 +114,7 @@ function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
 
     $process = proc_open($command, $descriptors, $pipes);
     if (!$process) {
-        throw new RuntimeException("Could not execute `$command`.");
+        throw new \RuntimeException("Could not execute `$command`.");
     }
 
     $stderr = trim(stream_get_contents($pipes[2]));
@@ -124,7 +123,7 @@ function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
     if ($stderr) {
         fclose($pipes[1]);
         proc_close($process);
-        throw new Exception($stderr);
+        throw new \Exception($stderr);
     }
 
     // Skip lines in the output that contain pre-processor cruft. Using the
