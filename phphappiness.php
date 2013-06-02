@@ -139,5 +139,6 @@ function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
     return (object) array('stdout' => $pipes[1], 'resource' => $process);
 }
 
+set_include_path(get_include_path() . PATH_SEPARATOR . './headers');
 stream_wrapper_register('cpp', 'PHPHappiness\CPPStreamWrapper');
 stream_wrapper_register('phph', 'PHPHappiness\CPPStreamWrapper');
