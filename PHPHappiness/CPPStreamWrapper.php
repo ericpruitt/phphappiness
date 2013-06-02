@@ -68,15 +68,10 @@ class CPPStreamWrapper
 
 function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
 {
-    if (is_link(__FILE__)) {
-        $include_path = dirname(readlink(__FILE__));
-    } else {
-        $include_path = dirname(__FILE__);
-    }
-
     $include_paths = explode(PATH_SEPARATOR, get_include_path());
-    $cppargs = array($cpp);
+    $include_paths[] = $script_path = dirname(__FILE__) . "/headers";
 
+    $cppargs = array($cpp);
     $skipped_lines = 3;
     foreach ($include_paths as $path) {
         if (!is_dir($path)) {
@@ -95,7 +90,6 @@ function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
                     $skipped_lines += 2;
                 }
             }
-
         }
 
         $cppargs[] = '-I';

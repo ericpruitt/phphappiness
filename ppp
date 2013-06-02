@@ -1,4 +1,4 @@
 #!/usr/bin/env php
 <?php
-require_once('phphappiness.php');
+require_once('PHPHappiness/CPPStreamWrapper.php');
 include('phph://' . $argv[1]);
