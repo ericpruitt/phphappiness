@@ -4,8 +4,8 @@
  * although the behaviour of a function may change, the calls need not be
  * modified.
  */
-#ifndef PHPHAPPINESS_H
-#define PHPHAPPINESS_H
+#ifndef NOSADNESS_H
+#define NOSADNESS_H
 
 // Issue 48 (http://phpsadness.com/sad/48):
 // Function naming is inconsistent with "to" and "2". Now you can use either.
