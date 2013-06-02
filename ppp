@@ -1,0 +1,4 @@
+#!/usr/bin/env php
+<?php
+require_once('phphappiness.php');
+include('phph://' . $argv[1]);
