@@ -1,47 +1,100 @@
 PHP Happiness
 =============
+
 PHP Happiness sets out to correct many of the evils of PHP using the C / C++
-preprocessor language. To use PHP Happiness, simply add C-style include
-directives to your PHP code and run any standard macro processor on the files.
+preprocessor language and a stream wrapper to transform code behind the scenes.
+If your initial reaction to that statement if "WTF?," please read the FAQ at
+the bottom of this document.
 
-Here's an example of a function using the strict-argument type macros:
+Introduction
+------------
 
-    FUNCTION(concatenate, REQ(string, $leftstring); REQ(string, $rightstring))
+Various macros are defined in the header files distributed with PHP Happiness,
+and they are located under `PHPHappiness/headers` relative to the repository
+root. Some of the macros simply wrap existing functions to change their
+behaviour whereas others are used to supplement existing syntax. For full
+documentation of the macros and function overrides, review the header files'
+contents, but a few examples will be covered here.
+
+### Parameter Type Enforcement ###
+
+Functions with strictly enforced parameter types can be created using the
+FUNCTION macro, used for declaring the function, and the REQ macro, used for
+specifying type restrictions. In the this example, the function `multiply` is
+created with strict enforcement for float parameters:
+
+    <?php
+    FUNCTION(multiply, REQ(float, $a); REQ(float, $b))
     {
-        return $leftstring . $rightstring;
+        return $a * $b;
     }
     ENDFUNCTION
 
-And here are a couple of examples using `cpp` on Linux to pre-process the code
-before piping it into the PHP interpreter.
+The result when executed with valid parameters:
 
-    phphappiness% cpp -P -I. examples/argtypes.php | php
+    php> multiply(2.5, 7.3);
+    18.25
+
+The result when executed with invalid parameters:
+
+    php> multiply("2.5", 7.3);
+    PHP Fatal error:  Uncaught exception 'InvalidArgumentException' with
+                      message 'Got string for argument 1 but expected float' in
+                      demo:2
+
+### Missing Exceptions ###
+
+Normally, functions like `json_decode` and `preg_match` fail silently, and in
+the case of `json_decode`, it is not possible to discern a legitimate return
+value from an error without explicitly checking `json_last_error` each time.
+The `exceptions.h` header file wraps many functions that normally fail without
+exceptions to throw errors on exceptional conditions.
+
+When `json_decode` fails, `null` is returned, but `null` may also be returned
+when it succeeds if the encoded string is simply "null". Here is failure in
+standard PHP:
+
+    php> json_decode('noll');
+    null;
+
+This is what happens when the invalid value is decoded with using the macro
+provided by PHP Happiness:
+
+    php> json_decode('noll');
+    PHP Fatal error:  Uncaught exception 'DomainException' with message
+                      'json_last_error() error 4' in demo(2) : eval()'d code:1
+
+Installation
+------------
+
+PHP Happiness requires a C preprocessor. It has only been tested with the GCC C
+preprocessor, but it may work with others. Aside from that, everything else is
+vanilla PHP and simply need only be copied where it can be accessed by
+applications that depend on it.
+
+PHP Happiness is PSR-0 compliant, but the `CPPStreamWrapper.php` file is
+generally best explicitly imported with a `require_once` call to register the
+stream wrappers for the `cpp://` and `php://` schemes. Once the stream wrapper
+has been registered, code dependent on the PHP Happiness macros can be included
+with a call like `include("phph://example.php")`. Files using the `phph` scheme
+will automatically have all headers in the `PHPHappiness/headers` folder
+immediately available along with any other header files found in the PHP
+includes folders and `./headers` relative to the calling script. If the `cpp`
+scheme is used, headers must be explicitly loaded using the `#include` C
+preprocessor directive. The C preprocessor will search all the directories
+defined in the include path, `./headers` relative to the calling script and the
+bundled PHP Happiness headers folder for header files.
+
+There is also a helper script included with PHP Happiness named `ppp` which
+stands for PHP Happiness Pre-processor. Run `ppp -h` for full usage
+information, but the general syntax is simple `ppp $FILENAME` where `$FILENAME`
+is the path to a PHP script dependent on PHP Happiness:
+
+    phphappiness% chmod +x ppp
+    phphappiness% ./ppp examples/argtypes.php 
     The password for 'jameseric' has been changed to 'hunter2'!
-    PHP Fatal error:  Uncaught exception 'InvalidArgumentException' with message 'Argument 1 is not integer.' in -:2
-    Stack trace:
-    #0 -(8): passwd('1001', 'bobbytables', 'lulzsec')
-    #1 {main}
-      thrown in - on line 2
-
-    phphappiness% cpp -P -I. examples/phphappiness.php | php
-    var_dump(array_fill(0, 1, 'zazoo'));
-    array(1) {
-      [0]=>
-      string(5) "zazoo"
-    }
-
-    var_dumpp(array_fill(0, 0, 'simba'));
-    array(0) {
-    }
-
-To see what various macros are available, please review the header files for
-full documentation.
-
-License
--------
-
-Unless you need an explicit license, consider this code public domain.
-Otherwise, refer to the LICENSE file for the full text of the BSD License.
+    passwd("1001", "bobbytables", "lulzsec") failed as expected.
+    4.2
 
 FAQ
 ---
