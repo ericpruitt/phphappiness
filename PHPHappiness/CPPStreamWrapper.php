@@ -71,6 +71,12 @@ class CPPStreamWrapper
     {
         return stat($this->_openened_path);
     }
+
+    public function stream_close()
+    {
+        fclose($this->_process->stdout);
+        proc_close($this->_process->resource);
+    }
 }
 
 function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
