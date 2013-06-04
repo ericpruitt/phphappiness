@@ -11,11 +11,34 @@
 
 //                               JSON Functions
 
-#define json_encode(...) \
-    THROWER(json_encode, (__VA_ARGS__), json_last_error(), DomainException)
+#if PHP_VERSION_ID < 50303
+#define JSON_ERROR_UTF8 5
+#endif
 
-#define json_decode(...) \
-    THROWER(json_decode, (__VA_ARGS__), json_last_error(), DomainException)
+# define JSON_THROWER(fname, ...) ( \
+($_ = fname(__VA_ARGS__)) !== null ? $_ : \
+(($__ = json_last_error()) ? ( \
+    ($__ == JSON_ERROR_DEPTH ? THROW(OverflowException, \
+        "The maximum stack depth has been exceeded") : \
+\
+    ($__ == JSON_ERROR_STATE_MISMATCH ? THROW(UnexpectedValueException, \
+        "Invalid or malformed JSON") : \
+\
+    ($__ == JSON_ERROR_CTRL_CHAR ? THROW(UnexpectedValueException, \
+        "Control character error, possibly incorrectly encoded") : \
+\
+    ($__ == JSON_ERROR_SYNTAX ? THROW(UnexpectedValueException, \
+        "Syntax error") : \
+\
+    ($__ == JSON_ERROR_UTF8 ? THROW(UnexpectedValueException, \
+        "Malformed UTF-8 characters, possibly incorrectly encoded") : \
+\
+    THROW(Exception, \
+        "Unknown JSON error"))))))) : $_ \
+))
+
+#define json_encode(...) JSON_THROWER(json_encode, __VA_ARGS__)
+#define json_decode(...) JSON_THROWER(json_decode, __VA_ARGS__)
 
 //                               PCRE Functions
 

@@ -78,7 +78,7 @@ function preprocess_file($phph_filename, $autoinclude, $cpp = 'cpp')
     $include_paths = explode(PATH_SEPARATOR, get_include_path());
     $include_paths[] = $script_path = dirname(__FILE__) . "/headers";
 
-    $cppargs = array($cpp);
+    $cppargs = array($cpp, '-D', 'PHP_VERSION_ID=' . PHP_VERSION_ID);
     $skipped_lines = 3;
     foreach ($include_paths as $path) {
         if (!is_dir($path)) {
