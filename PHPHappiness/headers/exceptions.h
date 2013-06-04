@@ -42,14 +42,31 @@
 
 //                               PCRE Functions
 
-#define preg_match(...) \
-    THROWER(preg_match, (__VA_ARGS__), preg_last_error(), RuntimeException)
+# define PREG_THROWER(fname, ...) ( \
+($_ = fname(__VA_ARGS__)) !== false ? $_ : \
+(($__ = preg_last_error()) ? ( \
+    ($__ == PREG_INTERNAL_ERROR ? THROW(Exception, \
+        "Internal PCRE error") : \
+\
+    ($__ == PREG_BACKTRACK_LIMIT_ERROR ? THROW(OutOfRangeException, \
+        "Backtrack limit was exhausted") : \
+\
+    ($__ == PREG_RECURSION_LIMIT_ERROR ? THROW(OutOfRangeException, \
+        "Recursion limit was exhausted") : \
+\
+    ($__ == PREG_BAD_UTF8_ERROR ? THROW(UnexpectedValueException, \
+        "Malformed UTF-8 data") : \
+\
+    ($__ == PREG_BAD_UTF8_OFFSET_ERROR ? THROW(UnexpectedValueException, \
+        "Offset didn't correspond to valid UTF-8 code point") : \
+\
+    THROW(Exception, \
+        "Unknown PCRE error"))))))) : $_ \
+))
 
-#define preg_match_all(...) \
-    THROWER(preg_match_all, (__VA_ARGS__), preg_last_error(), RuntimeException)
-
-#define preg_match_replace(...) \
-    THROWER(preg_match_all, (__VA_ARGS__), preg_last_error(), RuntimeException)
+#define preg_match(...) PREG_THROWER(preg_match, __VA_ARGS__)
+#define preg_match_all(...) PREG_THROWER(preg_match_all, __VA_ARGS__)
+#define preg_match_replace(...) PREG_THROWER(preg_match_replace, __VA_ARGS__)
 
 //                              Socket Functions
 
