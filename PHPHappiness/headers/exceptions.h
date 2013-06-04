@@ -5,10 +5,6 @@
 
 #define THROW(type, message) (eval("throw new ".#type."(\"".message."\");"))
 
-#define THROWER(function, args, test, e) (((($_ = function args) or true) and \
-    (($__ = test) ? THROW(e, #test . " error $__") : \
-    false)) ?: $_)
-
 //                               JSON Functions
 
 #if PHP_VERSION_ID < 50303

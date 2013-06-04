@@ -32,7 +32,7 @@
     varname = func_get_arg($_++); \
     if(($__ = gettype(varname)) !== #type) { \
         if ($__ !== #type and \
-         !(in_array(#type, array("float", "real", "double")) and \
+         !((#type === "float" or #type === "real" or #type === "double") and \
           ($__ === "integer" or $__ === "double"))) { \
             $message = "Got $__ for argument $_ but expected ".#type; \
             throw new InvalidArgumentException($message); \
