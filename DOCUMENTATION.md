@@ -106,3 +106,25 @@ The example below and the example above are equivalent:
         echo 1 / 0, "\n";
     }
     ENDSILENCE
+
+exceptions.h
+------------
+
+The exceptions header wraps various functions so that exceptions are thrown
+when an error occurs. Here is a list of the functions that have been wrapped to
+throw exceptions:
+
+### JSON Functions ###
+
+    json_decode  json_encode
+
+### PCRE Functions ###
+
+    preg_match  preg_match_all  preg_match_replace
+
+### Socket Functions ###
+
+    socket_accept         socket_create_pair  socket_recv      socket_sendto
+    socket_bind           socket_create       socket_recvfrom  socket_set_option
+    socket_connect        socket_listen       socket_select    socket_write
+    socket_create_listen  socket_read         socket_send
