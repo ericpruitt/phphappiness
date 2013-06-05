@@ -67,9 +67,9 @@
 //                              Socket Functions
 
 // Generic macro for socket functions to test whether or not an error occurred.
-#define SOCKET_THROWER(fname, ...) ($_ = @fname(__VA_ARGS__) ?: \
-    (array($__ = socket_last_error(), $__ = socket_strerror($__), \
-    socket_clear_error(), THROW(Exception, $__))))
+#define SOCKET_THROWER(fname, ...) ((array(socket_clear_error(), $_ = \
+    @fname(__VA_ARGS__), $__ = socket_last_error()) and !$__) ? $_ : \
+    THROW(Exception, socket_strerror($__)))
 
 #define socket_accept(...) SOCKET_THROWER(socket_accept, __VA_ARGS__)
 #define socket_bind(...) SOCKET_THROWER(socket_bind, __VA_ARGS__)
