@@ -1,13 +1,3 @@
-/* Contexts are wrappers around closures to isolate the effects of code within.
- * The are presently two main context types. The vanilla BEGINCONTEXT /
- * ENDCONTEXT macros wrap a block of code in a closure definition and execute
- * it, but they also makes all currently scoped variables accessible to the
- * closure without having to explicitly specify a "use" clause.  The
- * LOGLEVELCONTEXT macro is used to define an error_reporting level for a block
- * of code and attempts ensure the error_reporting level is reset back to its
- * original value regardless of whether or not the code within throws an
- * exception.
- */
 #ifndef CONTEXTS_H
 #define CONTEXTS_H
 

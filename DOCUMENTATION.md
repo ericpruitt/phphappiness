@@ -52,3 +52,57 @@ calling the function like `updateStatistics(100, 9)`. Although `9` is an
 integer, it will still be accepted in place of a float. When calling the
 function like `updateStatistics(100.0, 7.2)`, an `InvalidArgumentException`
 exception will be raised because `100.0` is floating point type.
+
+contexts.h
+----------
+
+Contexts are wrappers around closures to isolate the effects of code within.
+The are presently two main context types.
+
+### BEGINCONTEXT and ENDCONTEXT ###
+
+The `BEGINCONTEXT` and `ENDCONTEXT` macros wrap a block of code in a closure
+definition and execute it, but they also make all currently scoped variables
+accessible to the closure without having to explicitly specify a "use" clause.
+In block below, a variable is defined outside a context block, updated inside
+the context and its value displayed inside the context block and outside the
+context block:
+
+    <?php
+    $var = 1000;
+    BEGINCONTEXT
+    {
+        $var = 2000;
+        echo "Inside context: \$var = $var\n";
+    }
+    ENDCONTEXT
+    echo "Outside context: \$var = $var\n";
+
+Executing this code generates the following output:
+
+    Inside context: $var = 2000
+    Outside context: $var = 1000
+
+### LOGLEVELCONTEXT and ENDLOGLEVELCONTEXT ###
+
+The `LOGLEVELCONTEXT` macro is used to define an error_reporting level for a
+block of code and attempts ensure the error_reporting level is reset back to
+its original value regardless of whether or not the code within throws an
+exception. It can be used to temporarily increase or decrease PHP's verbosity.
+The example below temporarily silences warnings caused by dividing by zero:
+
+    LOGLEVELCONTEXT(~E_ALL)
+    {
+        echo 1 / 0, "\n";
+    }
+    ENDLOGLEVELCONTEXT
+
+There is also the convenience macro `SILENCE` and its companion `ENDSILENCE`
+which are simply shorthand for setting the error reporting level to `~E_ALL`.
+The example below and the example above are equivalent:
+
+    SILENCE
+    {
+        echo 1 / 0, "\n";
+    }
+    ENDSILENCE
