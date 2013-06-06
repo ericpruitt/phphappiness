@@ -24,7 +24,7 @@
         "Control character error, possibly incorrectly encoded") : \
 \
     ($__ == JSON_ERROR_SYNTAX ? THROW(UnexpectedValueException, \
-        "Syntax error") : \
+        "JSON syntax error") : \
 \
     ($__ == JSON_ERROR_UTF8 ? THROW(UnexpectedValueException, \
         "Malformed UTF-8 characters, possibly incorrectly encoded") : \
