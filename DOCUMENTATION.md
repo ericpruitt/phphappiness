@@ -128,3 +128,44 @@ throw exceptions:
     socket_bind           socket_create       socket_recvfrom  socket_set_option
     socket_connect        socket_listen       socket_select    socket_write
     socket_create_listen  socket_read         socket_send
+
+nosadness.h
+-----------
+
+[PHP Sadness](http://phpsadness.com/) is a website describing various quirks
+and heartaches of PHP. This header sets out to correct issues described
+therein.
+
+### Issue 48: "To" versus "2" ###
+
+Function naming is inconsistent with respect to the use of "to" and "2", but
+with this header, either form can be used for many common functions. The
+current aliases are as follows:
+
+#### Aliases for functions containing 'to' ####
+
+    stream_copy_2_stream -> stream_copy_to_stream    str2upper -> strtoupper
+    str2lower -> strtolower                          unix2jd -> unixtojd
+    str2time -> strtotime
+
+#### Aliases for functions containing '2' ####
+
+    bintohex -> bin2hex    hextobin -> hex2bin    nltobr -> nl2br
+    degtorad -> deg2rad    iptolong -> ip2long
+    radtoreg -> rad2deg    longtoip -> long2ip
+
+### Issue 43: "array_fill" length argument ###
+
+Normally the `array_fill` function does not accept a length of zero, but now
+with this header, it does.
+
+### Issue 39: "__lambda_func" cannot be defined  ###
+
+To avoid issues with `__lambda_func`, all `__lambda_func` tokens are changed to
+`___lambda_func`.
+
+### Issue 9: Needle / Haystack Problem ###
+
+To make the functions consistent with the majority of PHP, `array_key`,
+`in_array` and `array_search` are redefined to accept arguments in haystack,
+needle order.
