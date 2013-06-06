@@ -11,9 +11,9 @@
 #define JSON_ERROR_UTF8 5
 #endif
 
-# define JSON_THROWER(fname, ...) ( \
-($_ = fname(__VA_ARGS__)) !== null ? $_ : \
-(($__ = json_last_error()) ? ( \
+# define JSON_THROWER(fname, ...) \
+(array(($_ = @fname(__VA_ARGS__))) and !($__ = json_last_error()) ? $_ : \
+ ( \
     ($__ == JSON_ERROR_DEPTH ? THROW(OverflowException, \
         "The maximum stack depth has been exceeded") : \
 \
@@ -30,16 +30,15 @@
         "Malformed UTF-8 characters, possibly incorrectly encoded") : \
 \
     THROW(Exception, \
-        "Unknown JSON error"))))))) : $_ \
-))
+        "Unknown JSON error"))))))))
 
 #define json_encode(...) JSON_THROWER(json_encode, __VA_ARGS__)
 #define json_decode(...) JSON_THROWER(json_decode, __VA_ARGS__)
 
 //                               PCRE Functions
 
-# define PREG_THROWER(fname, ...) ( \
-($_ = fname(__VA_ARGS__)) !== false ? $_ : \
+# define PREG_THROWER(fname, failrval, ...) ( \
+($_ = @fname(__VA_ARGS__)) !== failrval ? $_ : \
 (($__ = preg_last_error()) ? ( \
     ($__ == PREG_INTERNAL_ERROR ? THROW(Exception, \
         "Internal PCRE error") : \
@@ -60,9 +59,9 @@
         "Unknown PCRE error"))))))) : $_ \
 ))
 
-#define preg_match(...) PREG_THROWER(preg_match, __VA_ARGS__)
-#define preg_match_all(...) PREG_THROWER(preg_match_all, __VA_ARGS__)
-#define preg_match_replace(...) PREG_THROWER(preg_match_replace, __VA_ARGS__)
+#define preg_match(...) PREG_THROWER(preg_match, false, __VA_ARGS__)
+#define preg_match_all(...) PREG_THROWER(preg_match_all, false, __VA_ARGS__)
+#define preg_replace(...) PREG_THROWER(preg_replace, null, __VA_ARGS__)
 
 //                              Socket Functions
 
